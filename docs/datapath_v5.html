@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>16-Bit RISC CPU Datapath V5</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #060b14;
+    --surface: #0c1220;
+    --surface2: #0f1729;
+    --border: #1a2744;
+    --border-hi: #2a4a7f;
+    --text: #c8d6e5;
+    --text-dim: #4a6280;
+    --blue: #4a9eff;
+    --blue-dim: #1e3a5f;
+    --cyan: #22d3ee;
+    --green: #34d399;
+    --green-dim: #0d3b2a;
+    --orange: #f59e0b;
+    --orange-dim: #3d2800;
+    --purple: #a78bfa;
+    --purple-dim: #2a1f4e;
+    --red: #f87171;
+    --pink: #f472b6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 600px 400px at 50% 40%, rgba(74,158,255,0.03), transparent),
+      radial-gradient(ellipse 400px 300px at 80% 60%, rgba(167,139,250,0.02), transparent);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 28px 20px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--cyan);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .header .sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* Instruction format bar */
+  .inst-bar {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .inst-bar .seg {
+    padding: 8px 18px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .inst-bar .seg:last-child { border-right: none; }
+  .inst-bar .seg .s-label { color: var(--text-dim); font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .inst-bar .seg .s-val { font-weight: 600; }
+  .seg-op { background: rgba(167,139,250,0.06); }
+  .seg-op .s-val { color: var(--purple); }
+  .seg-rd { background: rgba(34,211,238,0.04); }
+  .seg-rd .s-val { color: var(--cyan); }
+  .seg-rs { background: rgba(52,211,153,0.04); }
+  .seg-rs .s-val { color: var(--green); }
+  .seg-im { background: rgba(245,158,11,0.04); }
+  .seg-im .s-val { color: var(--orange); }
+
+  /* SVG styles */
+  .comp {
+    fill: var(--surface);
+    stroke: var(--border);
+    stroke-width: 1.2;
+  }
+  .comp-hi {
+    fill: var(--surface2);
+    stroke: var(--blue);
+    stroke-width: 1.4;
+    filter: drop-shadow(0 0 8px rgba(74,158,255,0.08));
+  }
+  .comp-pc {
+    fill: var(--surface2);
+    stroke: var(--green);
+    stroke-width: 1.4;
+  }
+  .comp-mux {
+    fill: var(--surface);
+    stroke: var(--orange);
+    stroke-width: 1.3;
+  }
+  .comp-alu {
+    fill: var(--surface2);
+    stroke: var(--purple);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 10px rgba(167,139,250,0.1));
+  }
+  .comp-ctrl {
+    fill: var(--surface);
+    stroke: var(--orange);
+    stroke-width: 1.4;
+    filter: drop-shadow(0 0 8px rgba(245,158,11,0.06));
+  }
+  .comp-dmem {
+    fill: var(--surface2);
+    stroke: var(--pink);
+    stroke-width: 1.4;
+    filter: drop-shadow(0 0 8px rgba(244,114,182,0.08));
+  }
+
+  .t-main {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+    fill: var(--text);
+  }
+  .t-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    font-weight: 400;
+    text-anchor: middle;
+    dominant-baseline: central;
+    fill: var(--text-dim);
+  }
+  .t-port {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: var(--text-dim);
+  }
+  .t-sig {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    font-weight: 500;
+    fill: var(--orange);
+  }
+  .t-data {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-weight: 500;
+    fill: var(--blue);
+  }
+  .t-mux {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+    fill: var(--orange);
+  }
+
+  /* Paths */
+  .p-data {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .p-thin {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 1.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .p-ctrl {
+    fill: none;
+    stroke: var(--orange);
+    stroke-width: 1;
+    stroke-dasharray: 4 2.5;
+    stroke-linecap: round;
+    opacity: 0.7;
+  }
+  .p-pc {
+    fill: none;
+    stroke: var(--green);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .p-wb {
+    fill: none;
+    stroke: var(--purple);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .p-store {
+    fill: none;
+    stroke: var(--pink);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .junction { fill: var(--blue); }
+  .junction-g { fill: var(--green); }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .leg-line {
+    width: 24px;
+    height: 2.5px;
+    border-radius: 1px;
+  }
+  .leg-dash {
+    width: 24px;
+    height: 0;
+    border-top: 1.5px dashed var(--orange);
+    opacity: 0.7;
+  }
+
+  /* Instruction table */
+  .inst-table {
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+  }
+  .inst-table table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .inst-table th {
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  .inst-table td {
+    padding: 5px 12px;
+    border-bottom: 1px solid rgba(26,39,68,0.5);
+    text-align: center;
+    color: var(--text);
+  }
+  .inst-table tr:last-child td { border-bottom: none; }
+  .inst-table .op { color: var(--purple); }
+  .inst-table .asm { color: var(--cyan); text-align: left; }
+  .inst-table .desc { color: var(--text-dim); text-align: left; font-size: 9px; }
+  .inst-table .new-row td { background: rgba(244,114,182,0.04); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>16-Bit RISC CPU Datapath</h1>
+  <div class="sub">MOV · ADD · SUB · AND · OR · JMP · LD · ST &nbsp;(with offset addressing)</div>
+</div>
+
+<div class="inst-bar">
+  <div class="seg seg-op"><span class="s-label">Opcode</span><span class="s-val">4 bit</span></div>
+  <div class="seg seg-rd"><span class="s-label">Rd</span><span class="s-val">2 bit</span></div>
+  <div class="seg seg-rs"><span class="s-label">Rs</span><span class="s-val">2 bit</span></div>
+  <div class="seg seg-im"><span class="s-label">Imm/Offset</span><span class="s-val">8 bit</span></div>
+</div>
+
+<svg width="1000" height="560" viewBox="0 0 1000 560">
+  <defs>
+    <marker id="a-b" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5Z" fill="var(--blue)"/></marker>
+    <marker id="a-g" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5Z" fill="var(--green)"/></marker>
+    <marker id="a-o" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="var(--orange)"/></marker>
+    <marker id="a-p" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5Z" fill="var(--purple)"/></marker>
+    <marker id="a-pk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5Z" fill="var(--pink)"/></marker>
+  </defs>
+
+  <!-- PC -->
+  <rect x="32" y="238" width="68" height="46" rx="6" class="comp-pc"/>
+  <text x="66" y="256" class="t-main" style="fill:var(--green)">PC</text>
+  <text x="66" y="272" class="t-sub">16-bit</text>
+
+  <!-- PC+1 -->
+  <rect x="32" y="178" width="68" height="28" rx="5" class="comp" style="stroke:var(--green)"/>
+  <text x="66" y="193" class="t-main" style="fill:var(--green);font-size:10px">PC + 1</text>
+
+  <!-- PC MUX -->
+  <rect x="32" y="314" width="68" height="32" rx="5" class="comp-mux"/>
+  <text x="66" y="331" class="t-mux" style="font-size:9px">MUX_PC</text>
+
+  <!-- Instruction Memory -->
+  <rect x="148" y="215" width="112" height="68" rx="6" class="comp-hi"/>
+  <text x="204" y="242" class="t-main">Instr Mem</text>
+  <text x="204" y="258" class="t-sub">16-bit word</text>
+
+  <!-- Control Unit -->
+  <rect x="330" y="48" width="160" height="58" rx="6" class="comp-ctrl"/>
+  <text x="410" y="70" class="t-main" style="fill:var(--orange)">Control Unit</text>
+  <text x="410" y="86" class="t-sub">opcode → signals</text>
+
+  <!-- Register File -->
+  <rect x="340" y="195" width="146" height="120" rx="6" class="comp-hi"/>
+  <text x="413" y="240" class="t-main">Register File</text>
+  <text x="413" y="256" class="t-sub">R0 – R3</text>
+  <text x="348" y="212" class="t-port" text-anchor="start">Rd_addr</text>
+  <text x="348" y="270" class="t-port" text-anchor="start">Rs_addr</text>
+  <text x="348" y="308" class="t-port" text-anchor="start" style="fill:var(--purple)">Write_data ←</text>
+  <text x="478" y="222" class="t-port" text-anchor="end">→ Rd_data</text>
+  <text x="478" y="280" class="t-port" text-anchor="end">→ Rs_data</text>
+
+  <!-- MUX_A (ALU A source) -->
+  <rect x="538" y="218" width="56" height="32" rx="4" class="comp-mux"/>
+  <text x="566" y="235" class="t-mux" style="font-size:9px">MUX_A</text>
+
+  <!-- MUX_B (ALU B source) -->
+  <rect x="538" y="312" width="56" height="32" rx="4" class="comp-mux"/>
+  <text x="566" y="329" class="t-mux" style="font-size:9px">MUX_B</text>
+
+  <!-- ALU -->
+  <polygon points="648,218 722,240 722,330 648,352 666,285" class="comp-alu"/>
+  <text x="694" y="278" class="t-main" style="fill:var(--purple);font-size:13px">ALU</text>
+  <text x="694" y="296" class="t-sub">+ − & | pass</text>
+
+  <!-- Data Memory -->
+  <rect x="768" y="222" width="120" height="86" rx="6" class="comp-dmem"/>
+  <text x="828" y="254" class="t-main" style="fill:var(--pink)">Data Mem</text>
+  <text x="828" y="270" class="t-sub">16-bit word</text>
+  <text x="776" y="240" class="t-port" text-anchor="start">addr →</text>
+  <text x="776" y="298" class="t-port" text-anchor="start" style="fill:var(--pink)">w_data →</text>
+  <text x="880" y="290" class="t-port" text-anchor="end">→ r_data</text>
+
+  <!-- MUX_WB (write-back source) -->
+  <rect x="768" y="340" width="120" height="32" rx="4" class="comp-mux"/>
+  <text x="828" y="357" class="t-mux" style="font-size:9px">MUX_WB</text>
+
+  <!-- Data Paths -->
+  <line x1="100" y1="261" x2="146" y2="261" class="p-data" marker-end="url(#a-b)"/>
+  <text x="124" y="254" class="t-data">addr</text>
+
+  <line x1="66" y1="238" x2="66" y2="208" class="p-pc" marker-end="url(#a-g)"/>
+  <polyline points="32,192 18,192 18,324 30,324" class="p-pc" marker-end="url(#a-g)"/>
+  <text x="12" y="258" class="t-data" style="fill:var(--green)" text-anchor="middle">0</text>
+  <line x1="66" y1="314" x2="66" y2="286" class="p-pc" marker-end="url(#a-g)"/>
+
+  <!-- Field fan-out -->
+  <path d="M260,232 L290,232 L290,77 L328,77" class="p-thin" marker-end="url(#a-b)"/>
+  <text x="280" y="156" class="t-data" style="font-size:7.5px">[15:12]</text>
+  <text x="280" y="166" class="t-data" style="font-size:7.5px">opcode</text>
+
+  <path d="M260,244 L300,244 L300,210 L338,210" class="p-thin" marker-end="url(#a-b)"/>
+  <text x="292" y="204" class="t-data" style="font-size:7.5px">[11:10] Rd</text>
+
+  <path d="M260,256 L296,256 L296,268 L338,268" class="p-thin" marker-end="url(#a-b)"/>
+  <text x="292" y="262" class="t-data" style="font-size:7.5px">[9:8] Rs</text>
+
+  <path d="M260,270 L286,270 L286,420" class="p-thin"/>
+  <circle cx="286" cy="420" r="3" class="junction"/>
+  <text x="275" y="388" class="t-data" style="font-size:7.5px;writing-mode:tb">[7:0] Imm</text>
+
+  <path d="M286,420 L548,420 L548,346" class="p-thin" marker-end="url(#a-b)"/>
+  <text x="420" y="414" class="t-data">Immediate / Offset (8-bit)</text>
+
+  <path d="M286,420 L286,480 L48,480 L48,348" class="p-thin" marker-end="url(#a-b)"/>
+  <text x="162" y="494" class="t-data">jump target</text>
+  <text x="36" y="402" class="t-data" style="fill:var(--green)">1</text>
+
+  <!-- Reg File to ALU path -->
+  <path d="M486,220 L510,220" class="p-data"/>
+  <circle cx="510" cy="220" r="2.8" class="junction"/>
+  <path d="M510,220 L520,220 L520,228 L536,228" class="p-data" marker-end="url(#a-b)"/>
+  <text x="524" y="222" class="t-data">0</text>
+
+  <path d="M486,278 L510,278" class="p-data"/>
+  <circle cx="510" cy="278" r="2.8" class="junction"/>
+  <path d="M510,278 L518,278 L518,242 L536,242" class="p-data" marker-end="url(#a-b)"/>
+  <text x="524" y="248" class="t-data">1</text>
+
+  <path d="M510,278 L518,278 L518,322 L536,322" class="p-data" marker-end="url(#a-b)"/>
+  <text x="524" y="316" class="t-data">0</text>
+  <text x="524" y="342" class="t-data">1</text>
+
+  <path d="M594,234 L620,234 L620,252 L646,252" class="p-data" marker-end="url(#a-b)"/>
+  <text x="630" y="246" class="t-data">A</text>
+
+  <path d="M594,328 L620,328 L620,316 L646,316" class="p-data" marker-end="url(#a-b)"/>
+  <text x="630" y="326" class="t-data">B</text>
+
+  <path d="M722,285 L744,285" class="p-wb"/>
+  <circle cx="744" cy="285" r="3" style="fill:var(--purple)"/>
+
+  <path d="M744,285 L744,238 L766,238" class="p-data" marker-end="url(#a-b)"/>
+  <text x="750" y="260" class="t-data" style="font-size:7.5px">addr</text>
+
+  <path d="M744,285 L744,350 L766,350" class="p-wb" marker-end="url(#a-p)"/>
+  <text x="756" y="346" class="t-data" style="fill:var(--purple)">0</text>
+
+  <path d="M888,288 L904,288 L904,362 L890,362" class="p-wb" marker-end="url(#a-p)"/>
+  <text x="898" y="330" class="t-data" style="fill:var(--purple);font-size:7.5px">r_data</text>
+  <text x="894" y="358" class="t-data" style="fill:var(--purple)">1</text>
+
+  <path d="M510,220 L510,168 L856,168 L856,222 L840,222 L840,296 L834,296" class="p-store"/>
+  <path d="M840,296 L834,296" class="p-store" marker-end="url(#a-pk)"/>
+  <text x="680" y="162" class="t-data" style="fill:var(--pink);font-size:8px">store: Rd_data → write_data</text>
+
+  <path d="M828,372 L828,510 L330,510 L330,305 L338,305" class="p-wb" marker-end="url(#a-p)"/>
+  <text x="580" y="504" class="t-data" style="fill:var(--purple);font-size:9px">Write-back → Write_data port</text>
+
+  <!-- Control Signals -->
+  <path d="M345,106 L345,130 L230,130 L230,42 L66,42 L66,64 L56,64 L56,312" class="p-ctrl" marker-end="url(#a-o)"/>
+  <text x="146" y="38" class="t-sig">Jump</text>
+
+  <path d="M370,106 L370,140 L335,140 L335,193" class="p-ctrl" marker-end="url(#a-o)"/>
+  <text x="338" y="168" class="t-sig">RegWrite</text>
+
+  <path d="M400,106 L400,148 L566,148 L566,216" class="p-ctrl" marker-end="url(#a-o)"/>
+  <text x="490" y="143" class="t-sig">ALUASrc</text>
+
+  <path d="M420,106 L420,155 L556,155 L556,310" class="p-ctrl" marker-end="url(#a-o)"/>
+  <text x="498" y="150" class="t-sig">ALUSrc</text>
+
+  <path d="M440,106 L440,138 L694,138 L694,216" class="p-ctrl" marker-end="url(#a-o)"/>
+  <text x="590" y="134" class="t-sig">ALUOp[2:0]</text>
+
+  <path d="M460,106 L460,128 L920,128 L920,248 L890,248" class="p-ctrl" marker-end="url(#a-o)"/>
+  <text x="740" y="124" class="t-sig">MemWrite</text>
+
+  <path d="M470,106 L470,120 L936,120 L936,282 L890,282" class="p-ctrl" marker-end="url(#a-o)"/>
+  <text x="810" y="116" class="t-sig">MemRead</text>
+
+  <path d="M480,106 L480,112 L950,112 L950,356 L890,356" class="p-ctrl" marker-end="url(#a-o)"/>
+  <text x="870" y="108" class="t-sig">MemToReg</text>
+</svg>
+
+<div class="legend">
+  <div class="legend-item"><div class="leg-line" style="background:var(--blue)"></div>Data path</div>
+  <div class="legend-item"><div class="leg-line" style="background:var(--purple)"></div>Write-back</div>
+  <div class="legend-item"><div class="leg-line" style="background:var(--green)"></div>PC path</div>
+  <div class="legend-item"><div class="leg-line" style="background:var(--pink)"></div>Store path</div>
+  <div class="legend-item"><div class="leg-dash"></div>Control signal</div>
+</div>
+
+<div class="inst-table">
+  <table>
+    <tr>
+      <th>Opcode</th><th>Assembly</th><th>Function</th><th>ALUASrc</th><th>ALUSrc</th><th>ALUOp</th><th>MemW</th><th>MemR</th><th>Mem2Reg</th><th>RegW</th><th>Jump</th>
+    </tr>
+    <tr>
+      <td class="op">0000</td><td class="asm">mov Rd, #imm</td><td class="desc">Rd ← imm</td>
+      <td>0</td><td>1</td><td>pass</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="op">0001</td><td class="asm">mov Rd, Rs</td><td class="desc">Rd ← Rs</td>
+      <td>1</td><td>0</td><td>pass</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="op">0010</td><td class="asm">add Rd, #imm</td><td class="desc">Rd ← Rd + imm</td>
+      <td>0</td><td>1</td><td>add</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="op">0011</td><td class="asm">add Rd, Rs</td><td class="desc">Rd ← Rd + Rs</td>
+      <td>0</td><td>0</td><td>add</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="op">0101</td><td class="asm">sub Rd, Rs</td><td class="desc">Rd ← Rd − Rs</td>
+      <td>0</td><td>0</td><td>sub</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="op">0111</td><td class="asm">and Rd, Rs</td><td class="desc">Rd ← Rd & Rs</td>
+      <td>0</td><td>0</td><td>and</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="op">1001</td><td class="asm">or Rd, Rs</td><td class="desc">Rd ← Rd | Rs</td>
+      <td>0</td><td>0</td><td>or</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="op">1010</td><td class="asm">jump #imm</td><td class="desc">PC ← imm</td>
+      <td>x</td><td>x</td><td>x</td><td>0</td><td>0</td><td>x</td><td>0</td><td>1</td>
+    </tr>
+    <tr class="new-row">
+      <td class="op">1100</td><td class="asm">ld Rd, Rs, #off</td><td class="desc">Rd ← Mem[Rs+off]</td>
+      <td>1</td><td>1</td><td>add</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td>
+    </tr>
+    <tr class="new-row">
+      <td class="op">1101</td><td class="asm">st Rd, Rs, #off</td><td class="desc">Mem[Rs+off] ← Rd</td>
+      <td>1</td><td>1</td><td>add</td><td>1</td><td>0</td><td>x</td><td>0</td><td>0</td>
+    </tr>
+  </table>
+</div>
+
+</body>
+</html>

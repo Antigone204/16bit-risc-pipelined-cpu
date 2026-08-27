@@ -1,0 +1,23 @@
+# Simulation outputs
+*.vcd
+*.wdb
+*.log
+sim_out
+sim_out.exe
+
+# Vivado / EDA tool outputs
+.Xil/
+*.jou
+*.str
+*.pb
+*.bit
+*.dcp
+*.rpt
+xsim.dir/
+webtalk*.xml
+webtalk*.log
+
+# OS generated files
+.DS_Store
+*.swp
+*~
