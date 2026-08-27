@@ -3,26 +3,37 @@
 // ============================================================================
 // Module: cpu_top
 // Description: Top-Level 16-Bit RISC 5-Stage Pipelined CPU
-// Features:
-//   - 5 Stages: IF -> ID -> EX -> MEM -> WB
-//   - Full Forwarding Unit (EX/MEM & MEM/WB -> EX) for RAW Data Hazards
-//   - Hazard Detection Unit (HDU) in ID stage for Load-Use Hazard Bubble Stall
-//   - Control Hazard Jump Flush logic
+// Target Hardware: EES-331 FPGA Board (Xilinx Zynq XC7Z020)
+// Reference: "Computer Organization and Design RISC-V Edition"
+//            by David A. Patterson & John L. Hennessy
+//
+// Ports:
+//   - clk: 100MHz system clock (Pin M19)
+//   - rst: Active-high board reset (Pin S1, inverted internally)
+//   - led[7:0]: Board LED outputs (led[7:4] = R0[3:0], led[3:0] = R1[3:0])
 // ============================================================================
 module cpu_top (
-    input  wire        clk,
-    input  wire        rst_n,
+    input  wire       clk,
+    input  wire       rst,           // Active-high from board button S1
+    output wire [7:0] led,           // On-board 8 LEDs for hardware observation
     
-    // Probing signals for verification
+    // Probing signals for cycle-accurate simulation
     output wire [15:0] pc_out,
     output wire [15:0] if_id_instr_out,
     output wire [15:0] alu_result_out,
     output wire [15:0] wb_data_out,
-    output wire [15:0] r0,
-    output wire [15:0] r1,
-    output wire [15:0] r2,
-    output wire [15:0] r3
+    output wire [15:0] r0_out,
+    output wire [15:0] r1_out,
+    output wire [15:0] r2_out,
+    output wire [15:0] r3_out
 );
+
+    // ------------------------------------------------------------------------
+    // Board Reset Polarity Handling:
+    // S1 button on EES-331 is pulled-up to 3.3V, so pressing it pulls low.
+    // Invert rst internally to create active-low synchronous reset (rst_n).
+    // ------------------------------------------------------------------------
+    wire rst_n = ~rst;
 
     // ========================================================================
     // 1. IF Stage (Instruction Fetch)
@@ -53,7 +64,7 @@ module cpu_top (
         .instr (instr_fetched)
     );
     
-    // IF/ID Pipeline Register
+    // IF/ID Pipeline Register (Priority: Flush > Write)
     wire [15:0] if_id_instr;
     wire [15:0] if_id_pc;
     
@@ -74,7 +85,7 @@ module cpu_top (
     wire [3:0]  id_opcode  = if_id_instr[15:12];
     wire [1:0]  id_rd_addr = if_id_instr[11:10];
     wire [1:0]  id_rs_addr = if_id_instr[9:8];
-    wire [15:0] id_imm     = {{8{if_id_instr[7]}}, if_id_instr[7:0]}; // Sign extended
+    wire [15:0] id_imm     = {{8{if_id_instr[7]}}, if_id_instr[7:0]}; // Sign-extended
     
     // Control Unit
     wire        id_alu_a_src;
@@ -98,12 +109,13 @@ module cpu_top (
         .jump       (id_jump)
     );
     
-    // Jump Target MUX for PC Next
+    // Jump Target MUX
     assign pc_next = (id_jump) ? {8'h00, if_id_instr[7:0]} : pc_plus_1;
     
     // Register File
     wire [15:0] id_rd_data;
     wire [15:0] id_rs_data;
+    wire [15:0] r0, r1, r2, r3;
     
     // Forward-declared signals from WB Stage
     wire [15:0] wb_data;
@@ -126,7 +138,7 @@ module cpu_top (
         .r3      (r3)
     );
     
-    // Hazard Detection Unit (Load-Use & Jump Flush)
+    // Hazard Detection Unit (HDU)
     wire        id_ex_bubble;
     wire        id_ex_mem_read;
     wire [1:0]  id_ex_rd_addr;
@@ -191,7 +203,7 @@ module cpu_top (
     );
     
     // ========================================================================
-    // 3. EX Stage (Execution & Address Calculation)
+    // 3. EX Stage (Execute & Address Calculation)
     // ========================================================================
     wire [1:0]  forward_a;
     wire [1:0]  forward_b;
@@ -213,18 +225,18 @@ module cpu_top (
         .forward_b        (forward_b)
     );
     
-    // Stage 1: 3-to-1 Forwarding MUXes
+    // Level 1: 3-to-1 Forwarding Multiplexers
     wire [15:0] fwd_a_data = (forward_a == 2'b01) ? ex_mem_alu_result :
                              (forward_a == 2'b10) ? wb_data : id_ex_rd_data;
                              
     wire [15:0] fwd_b_data = (forward_b == 2'b01) ? ex_mem_alu_result :
                              (forward_b == 2'b10) ? wb_data : id_ex_rs_data;
     
-    // Stage 2: 2-to-1 Operand MUXes (Cascaded with Imm & ALUASrc / ALUSrc)
+    // Level 2: 2-to-1 Operand Multiplexers (Cascaded with Imm)
     wire [15:0] alu_in_a = (id_ex_alu_a_src == 1'b0) ? fwd_a_data : fwd_b_data;
     wire [15:0] alu_in_b = (id_ex_alu_src == 1'b0)   ? fwd_b_data : id_ex_imm;
     
-    // Store data (Rd register value) takes forwarded value
+    // Store data takes forwarded Rd
     wire [15:0] store_data = fwd_a_data;
     
     // ALU
@@ -313,11 +325,21 @@ module cpu_top (
     assign wb_data = (mem_wb_mem_to_reg) ? mem_wb_mem_read_data : mem_wb_alu_result;
     
     // ========================================================================
+    // Hardware LED Mapping (EES-331 Board Observability):
+    // led[7:4] = R0[3:0], led[3:0] = R1[3:0]
+    // ========================================================================
+    assign led = {r0[3:0], r1[3:0]};
+    
+    // ========================================================================
     // Probing Output Assignments
     // ========================================================================
     assign pc_out          = pc_current;
     assign if_id_instr_out = if_id_instr;
     assign alu_result_out  = alu_result;
     assign wb_data_out     = wb_data;
+    assign r0_out          = r0;
+    assign r1_out          = r1;
+    assign r2_out          = r2;
+    assign r3_out          = r3;
 
 endmodule
