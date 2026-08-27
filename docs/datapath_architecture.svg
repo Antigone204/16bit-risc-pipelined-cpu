@@ -1,189 +1,210 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" style="background:#060b14; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" width="100%" height="100%">
+  <!-- Background -->
+  <rect width="1000" height="560" fill="#060b14" rx="8"/>
+
   <defs>
-    <style>
-      .comp { fill: #0c1220; stroke: #1a2744; stroke-width: 1.2; }
-      .comp-hi { fill: #0f1729; stroke: #4a9eff; stroke-width: 1.4; }
-      .comp-pc { fill: #0f1729; stroke: #34d399; stroke-width: 1.4; }
-      .comp-mux { fill: #0c1220; stroke: #f59e0b; stroke-width: 1.3; }
-      .comp-alu { fill: #0f1729; stroke: #a78bfa; stroke-width: 1.5; }
-      .comp-ctrl { fill: #0c1220; stroke: #f59e0b; stroke-width: 1.4; }
-      .comp-dmem { fill: #0f1729; stroke: #f472b6; stroke-width: 1.4; }
-      .t-main { font-family: monospace; font-size: 12px; font-weight: 600; text-anchor: middle; dominant-baseline: central; fill: #c8d6e5; }
-      .t-sub { font-family: monospace; font-size: 8.5px; font-weight: 400; text-anchor: middle; dominant-baseline: central; fill: #4a6280; }
-      .t-port { font-family: monospace; font-size: 8px; fill: #4a6280; }
-      .t-sig { font-family: monospace; font-size: 8.5px; font-weight: 500; fill: #f59e0b; }
-      .t-data { font-family: monospace; font-size: 8px; font-weight: 500; fill: #4a9eff; }
-      .t-mux { font-family: monospace; font-size: 10px; font-weight: 600; text-anchor: middle; dominant-baseline: central; fill: #f59e0b; }
-      .p-data { fill: none; stroke: #4a9eff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-      .p-thin { fill: none; stroke: #4a9eff; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
-      .p-ctrl { fill: none; stroke: #f59e0b; stroke-width: 1; stroke-dasharray: 4 2.5; stroke-linecap: round; opacity: 0.7; }
-      .p-pc { fill: none; stroke: #34d399; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-      .p-wb { fill: none; stroke: #a78bfa; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-      .p-store { fill: none; stroke: #f472b6; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-      .junction { fill: #4a9eff; }
-      .junction-g { fill: #34d399; }
-    </style>
-    <marker id="a-b" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5Z" fill="#4a9eff"/></marker>
-    <marker id="a-g" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5Z" fill="#34d399"/></marker>
-    <marker id="a-o" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="#f59e0b"/></marker>
-    <marker id="a-p" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5Z" fill="#a78bfa"/></marker>
-    <marker id="a-pk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5Z" fill="#f472b6"/></marker>
+    <marker id="a-b" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <path d="M0,0 L7,2.5 L0,5Z" fill="#4a9eff"/>
+    </marker>
+    <marker id="a-g" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <path d="M0,0 L7,2.5 L0,5Z" fill="#34d399"/>
+    </marker>
+    <marker id="a-o" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+      <path d="M0,0 L6,2 L0,4Z" fill="#f59e0b"/>
+    </marker>
+    <marker id="a-p" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <path d="M0,0 L7,2.5 L0,5Z" fill="#a78bfa"/>
+    </marker>
+    <marker id="a-pk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <path d="M0,0 L7,2.5 L0,5Z" fill="#f472b6"/>
+    </marker>
   </defs>
 
-  <!-- Header -->
-  <text x="500" y="25" fill="#22d3ee" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" letter-spacing="2">16-BIT RISC CPU DATAPATH ARCHITECTURE</text>
+  <!-- Title -->
+  <text x="500" y="30" fill="#22d3ee" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace" font-size="16" font-weight="bold" text-anchor="middle" letter-spacing="2">16-BIT RISC CPU DATAPATH ARCHITECTURE</text>
 
-  <!-- PC -->
-  <rect x="32" y="238" width="68" height="46" rx="6" class="comp-pc"/>
-  <text x="66" y="256" class="t-main" fill="#34d399">PC</text>
-  <text x="66" y="272" class="t-sub">16-bit</text>
+  <!-- ==================== COMPONENTS ==================== -->
 
-  <!-- PC+1 -->
-  <rect x="32" y="178" width="68" height="28" rx="5" class="comp" stroke="#34d399"/>
-  <text x="66" y="193" class="t-main" fill="#34d399" font-size="10">PC + 1</text>
+  <!-- PC Register -->
+  <rect x="32" y="238" width="68" height="46" rx="6" fill="#0f1729" stroke="#34d399" stroke-width="1.5"/>
+  <text x="66" y="256" fill="#34d399" font-family="monospace" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central">PC</text>
+  <text x="66" y="272" fill="#4a6280" font-family="monospace" font-size="8.5" text-anchor="middle" dominant-baseline="central">16-bit</text>
+
+  <!-- PC+1 Adder -->
+  <rect x="32" y="178" width="68" height="28" rx="5" fill="#0c1220" stroke="#34d399" stroke-width="1.2"/>
+  <text x="66" y="193" fill="#34d399" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle" dominant-baseline="central">PC + 1</text>
 
   <!-- PC MUX -->
-  <rect x="32" y="314" width="68" height="32" rx="5" class="comp-mux"/>
-  <text x="66" y="331" class="t-mux" font-size="9">MUX_PC</text>
+  <rect x="32" y="314" width="68" height="32" rx="5" fill="#0c1220" stroke="#f59e0b" stroke-width="1.3"/>
+  <text x="66" y="331" fill="#f59e0b" font-family="monospace" font-size="9.5" font-weight="bold" text-anchor="middle" dominant-baseline="central">MUX_PC</text>
 
   <!-- Instruction Memory -->
-  <rect x="148" y="215" width="112" height="68" rx="6" class="comp-hi"/>
-  <text x="204" y="242" class="t-main">Instr Mem</text>
-  <text x="204" y="258" class="t-sub">16-bit word</text>
+  <rect x="148" y="215" width="112" height="68" rx="6" fill="#0f1729" stroke="#4a9eff" stroke-width="1.5"/>
+  <text x="204" y="242" fill="#c8d6e5" font-family="monospace" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central">Instr Mem</text>
+  <text x="204" y="258" fill="#4a6280" font-family="monospace" font-size="8.5" text-anchor="middle" dominant-baseline="central">16-bit word</text>
 
   <!-- Control Unit -->
-  <rect x="330" y="48" width="160" height="58" rx="6" class="comp-ctrl"/>
-  <text x="410" y="70" class="t-main" fill="#f59e0b">Control Unit</text>
-  <text x="410" y="86" class="t-sub">opcode → signals</text>
+  <rect x="330" y="48" width="160" height="58" rx="6" fill="#0c1220" stroke="#f59e0b" stroke-width="1.4"/>
+  <text x="410" y="70" fill="#f59e0b" font-family="monospace" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central">Control Unit</text>
+  <text x="410" y="86" fill="#4a6280" font-family="monospace" font-size="8.5" text-anchor="middle" dominant-baseline="central">opcode → signals</text>
 
   <!-- Register File -->
-  <rect x="340" y="195" width="146" height="120" rx="6" class="comp-hi"/>
-  <text x="413" y="240" class="t-main">Register File</text>
-  <text x="413" y="256" class="t-sub">R0 – R3</text>
-  <text x="348" y="212" class="t-port" text-anchor="start">Rd_addr</text>
-  <text x="348" y="270" class="t-port" text-anchor="start">Rs_addr</text>
-  <text x="348" y="308" class="t-port" text-anchor="start" fill="#a78bfa">Write_data ←</text>
-  <text x="478" y="222" class="t-port" text-anchor="end">→ Rd_data</text>
-  <text x="478" y="280" class="t-port" text-anchor="end">→ Rs_data</text>
+  <rect x="340" y="195" width="146" height="120" rx="6" fill="#0f1729" stroke="#4a9eff" stroke-width="1.5"/>
+  <text x="413" y="240" fill="#c8d6e5" font-family="monospace" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central">Register File</text>
+  <text x="413" y="256" fill="#4a6280" font-family="monospace" font-size="8.5" text-anchor="middle" dominant-baseline="central">R0 – R3</text>
+  <!-- Port labels -->
+  <text x="348" y="212" fill="#4a6280" font-family="monospace" font-size="8" text-anchor="start">Rd_addr</text>
+  <text x="348" y="270" fill="#4a6280" font-family="monospace" font-size="8" text-anchor="start">Rs_addr</text>
+  <text x="348" y="308" fill="#a78bfa" font-family="monospace" font-size="8" text-anchor="start">Write_data ←</text>
+  <text x="478" y="222" fill="#4a6280" font-family="monospace" font-size="8" text-anchor="end">→ Rd_data</text>
+  <text x="478" y="280" fill="#4a6280" font-family="monospace" font-size="8" text-anchor="end">→ Rs_data</text>
 
-  <!-- MUX_A -->
-  <rect x="538" y="218" width="56" height="32" rx="4" class="comp-mux"/>
-  <text x="566" y="235" class="t-mux" font-size="9">MUX_A</text>
+  <!-- MUX_A (ALU A Source) -->
+  <rect x="538" y="218" width="56" height="32" rx="4" fill="#0c1220" stroke="#f59e0b" stroke-width="1.3"/>
+  <text x="566" y="235" fill="#f59e0b" font-family="monospace" font-size="9.5" font-weight="bold" text-anchor="middle" dominant-baseline="central">MUX_A</text>
 
-  <!-- MUX_B -->
-  <rect x="538" y="312" width="56" height="32" rx="4" class="comp-mux"/>
-  <text x="566" y="329" class="t-mux" font-size="9">MUX_B</text>
+  <!-- MUX_B (ALU B Source) -->
+  <rect x="538" y="312" width="56" height="32" rx="4" fill="#0c1220" stroke="#f59e0b" stroke-width="1.3"/>
+  <text x="566" y="329" fill="#f59e0b" font-family="monospace" font-size="9.5" font-weight="bold" text-anchor="middle" dominant-baseline="central">MUX_B</text>
 
   <!-- ALU -->
-  <polygon points="648,218 722,240 722,330 648,352 666,285" class="comp-alu"/>
-  <text x="694" y="278" class="t-main" fill="#a78bfa" font-size="13">ALU</text>
-  <text x="694" y="296" class="t-sub">+ − & | pass</text>
+  <polygon points="648,218 722,240 722,330 648,352 666,285" fill="#0f1729" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="694" y="278" fill="#a78bfa" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="central">ALU</text>
+  <text x="694" y="296" fill="#4a6280" font-family="monospace" font-size="8.5" text-anchor="middle" dominant-baseline="central">+ − &amp; | pass</text>
 
   <!-- Data Memory -->
-  <rect x="768" y="222" width="120" height="86" rx="6" class="comp-dmem"/>
-  <text x="828" y="254" class="t-main" fill="#f472b6">Data Mem</text>
-  <text x="828" y="270" class="t-sub">16-bit word</text>
-  <text x="776" y="240" class="t-port" text-anchor="start">addr →</text>
-  <text x="776" y="298" class="t-port" text-anchor="start" fill="#f472b6">w_data →</text>
-  <text x="880" y="290" class="t-port" text-anchor="end">→ r_data</text>
+  <rect x="768" y="222" width="120" height="86" rx="6" fill="#0f1729" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="828" y="254" fill="#f472b6" font-family="monospace" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central">Data Mem</text>
+  <text x="828" y="270" fill="#4a6280" font-family="monospace" font-size="8.5" text-anchor="middle" dominant-baseline="central">16-bit word</text>
+  <text x="776" y="240" fill="#4a6280" font-family="monospace" font-size="8" text-anchor="start">addr →</text>
+  <text x="776" y="298" fill="#f472b6" font-family="monospace" font-size="8" text-anchor="start">w_data →</text>
+  <text x="880" y="290" fill="#4a6280" font-family="monospace" font-size="8" text-anchor="end">→ r_data</text>
 
-  <!-- MUX_WB -->
-  <rect x="768" y="340" width="120" height="32" rx="4" class="comp-mux"/>
-  <text x="828" y="357" class="t-mux" font-size="9">MUX_WB</text>
+  <!-- MUX_WB (Write-Back Source) -->
+  <rect x="768" y="340" width="120" height="32" rx="4" fill="#0c1220" stroke="#f59e0b" stroke-width="1.3"/>
+  <text x="828" y="357" fill="#f59e0b" font-family="monospace" font-size="9.5" font-weight="bold" text-anchor="middle" dominant-baseline="central">MUX_WB</text>
 
-  <!-- Routing Lines -->
-  <line x1="100" y1="261" x2="146" y2="261" class="p-data" marker-end="url(#a-b)"/>
-  <text x="124" y="254" class="t-data">addr</text>
+  <!-- ==================== ROUTING PATHS ==================== -->
 
-  <line x1="66" y1="238" x2="66" y2="208" class="p-pc" marker-end="url(#a-g)"/>
-  <polyline points="32,192 18,192 18,324 30,324" class="p-pc" marker-end="url(#a-g)"/>
-  <text x="12" y="258" class="t-data" fill="#34d399" text-anchor="middle">0</text>
-  <line x1="66" y1="314" x2="66" y2="286" class="p-pc" marker-end="url(#a-g)"/>
+  <!-- PC to Instr Mem -->
+  <line x1="100" y1="261" x2="146" y2="261" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="124" y="254" fill="#4a9eff" font-family="monospace" font-size="8" font-weight="bold">addr</text>
 
-  <!-- Fan-out -->
-  <path d="M260,232 L290,232 L290,77 L328,77" class="p-thin" marker-end="url(#a-b)"/>
-  <text x="280" y="156" class="t-data" font-size="7.5">[15:12]</text>
-  <text x="280" y="166" class="t-data" font-size="7.5">opcode</text>
+  <!-- PC to PC+1 -->
+  <line x1="66" y1="238" x2="66" y2="208" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-g)"/>
 
-  <path d="M260,244 L300,244 L300,210 L338,210" class="p-thin" marker-end="url(#a-b)"/>
-  <text x="292" y="204" class="t-data" font-size="7.5">[11:10] Rd</text>
+  <!-- PC+1 to MUX_PC input 0 -->
+  <polyline points="32,192 18,192 18,324 30,324" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-g)"/>
+  <text x="12" y="258" fill="#34d399" font-family="monospace" font-size="8" text-anchor="middle">0</text>
+  <line x1="66" y1="314" x2="66" y2="286" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-g)"/>
 
-  <path d="M260,256 L296,256 L296,268 L338,268" class="p-thin" marker-end="url(#a-b)"/>
-  <text x="292" y="262" class="t-data" font-size="7.5">[9:8] Rs</text>
+  <!-- Opcode -> Control Unit -->
+  <path d="M260,232 L290,232 L290,77 L328,77" fill="none" stroke="#4a9eff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="280" y="156" fill="#4a9eff" font-family="monospace" font-size="7.5">[15:12]</text>
+  <text x="280" y="166" fill="#4a9eff" font-family="monospace" font-size="7.5">opcode</text>
 
-  <path d="M260,270 L286,270 L286,420" class="p-thin"/>
-  <circle cx="286" cy="420" r="3" class="junction"/>
-  <text x="275" y="388" class="t-data" font-size="7.5">[7:0] Imm</text>
+  <!-- Rd -> Reg File Rd_addr -->
+  <path d="M260,244 L300,244 L300,210 L338,210" fill="none" stroke="#4a9eff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="292" y="204" fill="#4a9eff" font-family="monospace" font-size="7.5">[11:10] Rd</text>
 
-  <path d="M286,420 L548,420 L548,346" class="p-thin" marker-end="url(#a-b)"/>
-  <text x="420" y="414" class="t-data">Immediate / Offset (8-bit)</text>
+  <!-- Rs -> Reg File Rs_addr -->
+  <path d="M260,256 L296,256 L296,268 L338,268" fill="none" stroke="#4a9eff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="292" y="262" fill="#4a9eff" font-family="monospace" font-size="7.5">[9:8] Rs</text>
 
-  <path d="M286,420 L286,480 L48,480 L48,348" class="p-thin" marker-end="url(#a-b)"/>
-  <text x="162" y="494" class="t-data">jump target</text>
-  <text x="36" y="402" class="t-data" fill="#34d399">1</text>
+  <!-- Imm Fan-out -->
+  <path d="M260,270 L286,270 L286,420" fill="none" stroke="#4a9eff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="286" cy="420" r="3" fill="#4a9eff"/>
+  <text x="275" y="388" fill="#4a9eff" font-family="monospace" font-size="7.5">[7:0] Imm</text>
 
-  <path d="M486,220 L510,220" class="p-data"/>
-  <circle cx="510" cy="220" r="2.8" class="junction"/>
-  <path d="M510,220 L520,220 L520,228 L536,228" class="p-data" marker-end="url(#a-b)"/>
-  <text x="524" y="222" class="t-data">0</text>
+  <!-- Imm -> MUX_B input 1 -->
+  <path d="M286,420 L548,420 L548,346" fill="none" stroke="#4a9eff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="420" y="414" fill="#4a9eff" font-family="monospace" font-size="8">Immediate / Offset (8-bit)</text>
 
-  <path d="M486,278 L510,278" class="p-data"/>
-  <circle cx="510" cy="278" r="2.8" class="junction"/>
-  <path d="M510,278 L518,278 L518,242 L536,242" class="p-data" marker-end="url(#a-b)"/>
-  <text x="524" y="248" class="t-data">1</text>
+  <!-- Imm -> MUX_PC input 1 (Jump Target) -->
+  <path d="M286,420 L286,480 L48,480 L48,348" fill="none" stroke="#4a9eff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="162" y="494" fill="#4a9eff" font-family="monospace" font-size="8">jump target</text>
+  <text x="36" y="402" fill="#34d399" font-family="monospace" font-size="8">1</text>
 
-  <path d="M510,278 L518,278 L518,322 L536,322" class="p-data" marker-end="url(#a-b)"/>
-  <text x="524" y="316" class="t-data">0</text>
-  <text x="524" y="342" class="t-data">1</text>
+  <!-- Reg File Rd_data -->
+  <path d="M486,220 L510,220" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="510" cy="220" r="2.8" fill="#4a9eff"/>
+  <path d="M510,220 L520,220 L520,228 L536,228" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="524" y="222" fill="#4a9eff" font-family="monospace" font-size="8">0</text>
 
-  <path d="M594,234 L620,234 L620,252 L646,252" class="p-data" marker-end="url(#a-b)"/>
-  <text x="630" y="246" class="t-data">A</text>
+  <!-- Reg File Rs_data -->
+  <path d="M486,278 L510,278" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="510" cy="278" r="2.8" fill="#4a9eff"/>
+  <path d="M510,278 L518,278 L518,242 L536,242" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="524" y="248" fill="#4a9eff" font-family="monospace" font-size="8">1</text>
 
-  <path d="M594,328 L620,328 L620,316 L646,316" class="p-data" marker-end="url(#a-b)"/>
-  <text x="630" y="326" class="t-data">B</text>
+  <path d="M510,278 L518,278 L518,322 L536,322" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="524" y="316" fill="#4a9eff" font-family="monospace" font-size="8">0</text>
+  <text x="524" y="342" fill="#4a9eff" font-family="monospace" font-size="8">1</text>
 
-  <path d="M722,285 L744,285" class="p-wb"/>
+  <!-- MUX_A -> ALU A -->
+  <path d="M594,234 L620,234 L620,252 L646,252" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="630" y="246" fill="#4a9eff" font-family="monospace" font-size="8">A</text>
+
+  <!-- MUX_B -> ALU B -->
+  <path d="M594,328 L620,328 L620,316 L646,316" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="630" y="326" fill="#4a9eff" font-family="monospace" font-size="8">B</text>
+
+  <!-- ALU Result Junction -->
+  <path d="M722,285 L744,285" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="744" cy="285" r="3" fill="#a78bfa"/>
 
-  <path d="M744,285 L744,238 L766,238" class="p-data" marker-end="url(#a-b)"/>
-  <text x="750" y="260" class="t-data" font-size="7.5">addr</text>
+  <!-- ALU -> Data Mem Address -->
+  <path d="M744,285 L744,238 L766,238" fill="none" stroke="#4a9eff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-b)"/>
+  <text x="750" y="260" fill="#4a9eff" font-family="monospace" font-size="7.5">addr</text>
 
-  <path d="M744,285 L744,350 L766,350" class="p-wb" marker-end="url(#a-p)"/>
-  <text x="756" y="346" class="t-data" fill="#a78bfa">0</text>
+  <!-- ALU -> MUX_WB input 0 -->
+  <path d="M744,285 L744,350 L766,350" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-p)"/>
+  <text x="756" y="346" fill="#a78bfa" font-family="monospace" font-size="8">0</text>
 
-  <path d="M888,288 L904,288 L904,362 L890,362" class="p-wb" marker-end="url(#a-p)"/>
-  <text x="898" y="330" class="t-data" fill="#a78bfa" font-size="7.5">r_data</text>
-  <text x="894" y="358" class="t-data" fill="#a78bfa">1</text>
+  <!-- Data Mem Read Data -> MUX_WB input 1 -->
+  <path d="M888,288 L904,288 L904,362 L890,362" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-p)"/>
+  <text x="898" y="330" fill="#a78bfa" font-family="monospace" font-size="7.5">r_data</text>
+  <text x="894" y="358" fill="#a78bfa" font-family="monospace" font-size="8">1</text>
 
-  <path d="M510,220 L510,168 L856,168 L856,222 L840,222 L840,296 L834,296" class="p-store"/>
-  <path d="M840,296 L834,296" class="p-store" marker-end="url(#a-pk)"/>
-  <text x="680" y="162" class="t-data" fill="#f472b6" font-size="8">store: Rd_data → write_data</text>
+  <!-- Store Data Path: Rd_data -> Data Mem Write Data -->
+  <path d="M510,220 L510,168 L856,168 L856,222 L840,222 L840,296 L834,296" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-pk)"/>
+  <text x="680" y="162" fill="#f472b6" font-family="monospace" font-size="8">store: Rd_data → write_data</text>
 
-  <path d="M828,372 L828,510 L330,510 L330,305 L338,305" class="p-wb" marker-end="url(#a-p)"/>
-  <text x="580" y="504" class="t-data" fill="#a78bfa" font-size="9">Write-back → Write_data port</text>
+  <!-- Write-Back to Register File -->
+  <path d="M828,372 L828,510 L330,510 L330,305 L338,305" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a-p)"/>
+  <text x="580" y="504" fill="#a78bfa" font-family="monospace" font-size="9">Write-back → Write_data port</text>
 
-  <!-- Controls -->
-  <path d="M345,106 L345,130 L230,130 L230,42 L66,42 L66,64 L56,64 L56,312" class="p-ctrl" marker-end="url(#a-o)"/>
-  <text x="146" y="38" class="t-sig">Jump</text>
+  <!-- ==================== CONTROL SIGNALS ==================== -->
 
-  <path d="M370,106 L370,140 L335,140 L335,193" class="p-ctrl" marker-end="url(#a-o)"/>
-  <text x="338" y="168" class="t-sig">RegWrite</text>
+  <!-- Control -> Jump -->
+  <path d="M345,106 L345,130 L230,130 L230,42 L66,42 L66,64 L56,64 L56,312" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2.5" stroke-linecap="round" opacity="0.75" marker-end="url(#a-o)"/>
+  <text x="146" y="38" fill="#f59e0b" font-family="monospace" font-size="8.5" font-weight="bold">Jump</text>
 
-  <path d="M400,106 L400,148 L566,148 L566,216" class="p-ctrl" marker-end="url(#a-o)"/>
-  <text x="490" y="143" class="t-sig">ALUASrc</text>
+  <!-- Control -> RegWrite -->
+  <path d="M370,106 L370,140 L335,140 L335,193" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2.5" stroke-linecap="round" opacity="0.75" marker-end="url(#a-o)"/>
+  <text x="338" y="168" fill="#f59e0b" font-family="monospace" font-size="8.5" font-weight="bold">RegWrite</text>
 
-  <path d="M420,106 L420,155 L556,155 L556,310" class="p-ctrl" marker-end="url(#a-o)"/>
-  <text x="498" y="150" class="t-sig">ALUSrc</text>
+  <!-- Control -> ALUASrc -->
+  <path d="M400,106 L400,148 L566,148 L566,216" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2.5" stroke-linecap="round" opacity="0.75" marker-end="url(#a-o)"/>
+  <text x="490" y="143" fill="#f59e0b" font-family="monospace" font-size="8.5" font-weight="bold">ALUASrc</text>
 
-  <path d="M440,106 L440,138 L694,138 L694,216" class="p-ctrl" marker-end="url(#a-o)"/>
-  <text x="590" y="134" class="t-sig">ALUOp[2:0]</text>
+  <!-- Control -> ALUSrc -->
+  <path d="M420,106 L420,155 L556,155 L556,310" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2.5" stroke-linecap="round" opacity="0.75" marker-end="url(#a-o)"/>
+  <text x="498" y="150" fill="#f59e0b" font-family="monospace" font-size="8.5" font-weight="bold">ALUSrc</text>
 
-  <path d="M460,106 L460,128 L920,128 L920,248 L890,248" class="p-ctrl" marker-end="url(#a-o)"/>
-  <text x="740" y="124" class="t-sig">MemWrite</text>
+  <!-- Control -> ALUOp -->
+  <path d="M440,106 L440,138 L694,138 L694,216" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2.5" stroke-linecap="round" opacity="0.75" marker-end="url(#a-o)"/>
+  <text x="590" y="134" fill="#f59e0b" font-family="monospace" font-size="8.5" font-weight="bold">ALUOp[2:0]</text>
 
-  <path d="M470,106 L470,120 L936,120 L936,282 L890,282" class="p-ctrl" marker-end="url(#a-o)"/>
-  <text x="810" y="116" class="t-sig">MemRead</text>
+  <!-- Control -> MemWrite -->
+  <path d="M460,106 L460,128 L920,128 L920,248 L890,248" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2.5" stroke-linecap="round" opacity="0.75" marker-end="url(#a-o)"/>
+  <text x="740" y="124" fill="#f59e0b" font-family="monospace" font-size="8.5" font-weight="bold">MemWrite</text>
 
-  <path d="M480,106 L480,112 L950,112 L950,356 L890,356" class="p-ctrl" marker-end="url(#a-o)"/>
-  <text x="870" y="108" class="t-sig">MemToReg</text>
+  <!-- Control -> MemRead -->
+  <path d="M470,106 L470,120 L936,120 L936,282 L890,282" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2.5" stroke-linecap="round" opacity="0.75" marker-end="url(#a-o)"/>
+  <text x="810" y="116" fill="#f59e0b" font-family="monospace" font-size="8.5" font-weight="bold">MemRead</text>
+
+  <!-- Control -> MemToReg -->
+  <path d="M480,106 L480,112 L950,112 L950,356 L890,356" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2.5" stroke-linecap="round" opacity="0.75" marker-end="url(#a-o)"/>
+  <text x="870" y="108" fill="#f59e0b" font-family="monospace" font-size="8.5" font-weight="bold">MemToReg</text>
 </svg>

@@ -21,7 +21,7 @@
 
 本项目实现了一个基于经典 **5 级流水线（IF-ID-EX-MEM-WB）** 的 **16-bit RISC 处理器**。体系结构设计紧密遵循 Patterson & Hennessy 经典流水线模型，完整历经了数据冒险前推（Forwarding）、Load-Use 气泡停顿（HDU Bubble Stall）、连续访存冲突权衡，以及控制冒险跳转冲刷（Jump Flush）的演进周期，并成功部署于 **EES-331 FPGA 开发板（Xilinx Zynq XC7Z020）**。
 
-* **完整 5 级流水线**: Instruction Fetch (IF) $\to$ Instruction Decode (ID) $\to$ Execute (EX) $\to$ Memory Access (MEM) $\to$ Write Back (WB).
+* **完整 5 级流水线**: Instruction Fetch (IF) → Instruction Decode (ID) → Execute (EX) → Memory Access (MEM) → Write Back (WB).
 * **硬件级冒险消除机制 (Zero-Overhead RAW Resolution)**:
   * **Forwarding Unit (EX)**: 针对 RAW 数据依赖，提供 `EX/MEM` 与 `MEM/WB` 到 EX 阶段的双路 3-to-1 前推。
   * **Hazard Detection Unit (ID)**: 针对 Load-Use 冒险，自动冻结 PC 与 IF/ID 寄存器，并注入 1 周期气泡（Bubble）。
@@ -36,10 +36,9 @@
 
 ## 🏛 Architecture Overview
 
-<div align="center">
-  <img src="docs/datapath_architecture.svg" alt="CPU Datapath Architecture" width="95%"/>
-  <p><i>Figure 1: 16-Bit RISC CPU Datapath and Control Flow Diagram</i></p>
-</div>
+![CPU Datapath Architecture](./docs/datapath_architecture.svg)
+
+> 💡 *提示: 你也可以在浏览器中直接打开 [docs/datapath_v5.html](./docs/datapath_v5.html) 查看交互式数据通路页面。*
 
 ### 五级流水线职责划分
 
@@ -74,16 +73,16 @@
 
 | Opcode | 汇编助记符 | 指令功能 | ALUASrc | ALUSrc | ALUOp | MemW | MemR | Mem2Reg | RegW | Jump |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| `0000` | `mov Rd, #imm` | $Rd \leftarrow Imm$ | 0 | 1 | PASS | 0 | 0 | 0 | 1 | 0 |
-| `0001` | `mov Rd, Rs` | $Rd \leftarrow Rs$ | 1 | 0 | PASS | 0 | 0 | 0 | 1 | 0 |
-| `0010` | `add Rd, #imm` | $Rd \leftarrow Rd + Imm$ | 0 | 1 | ADD | 0 | 0 | 0 | 1 | 0 |
-| `0011` | `add Rd, Rs` | $Rd \leftarrow Rd + Rs$ | 0 | 0 | ADD | 0 | 0 | 0 | 1 | 0 |
-| `0101` | `sub Rd, Rs` | $Rd \leftarrow Rd - Rs$ | 0 | 0 | SUB | 0 | 0 | 0 | 1 | 0 |
-| `0111` | `and Rd, Rs` | $Rd \leftarrow Rd \ \& \ Rs$ | 0 | 0 | AND | 0 | 0 | 0 | 1 | 0 |
-| `1001` | `or Rd, Rs` | $Rd \leftarrow Rd \ \| \ Rs$ | 0 | 0 | OR | 0 | 0 | 0 | 1 | 0 |
-| `1010` | `jump #imm` | $PC \leftarrow Imm$ | x | x | x | 0 | 0 | x | 0 | 1 |
-| `1100` | `ld Rd, Rs, #off` | $Rd \leftarrow \text{Mem}[Rs + off]$ | 1 | 1 | ADD | 0 | 1 | 1 | 1 | 0 |
-| `1101` | `st Rd, Rs, #off` | $\text{Mem}[Rs + off] \leftarrow Rd$ | 1 | 1 | ADD | 1 | 0 | x | 0 | 0 |
+| `0000` | `mov Rd, #imm` | `Rd ← Imm` | 0 | 1 | PASS | 0 | 0 | 0 | 1 | 0 |
+| `0001` | `mov Rd, Rs` | `Rd ← Rs` | 1 | 0 | PASS | 0 | 0 | 0 | 1 | 0 |
+| `0010` | `add Rd, #imm` | `Rd ← Rd + Imm` | 0 | 1 | ADD | 0 | 0 | 0 | 1 | 0 |
+| `0011` | `add Rd, Rs` | `Rd ← Rd + Rs` | 0 | 0 | ADD | 0 | 0 | 0 | 1 | 0 |
+| `0101` | `sub Rd, Rs` | `Rd ← Rd - Rs` | 0 | 0 | SUB | 0 | 0 | 0 | 1 | 0 |
+| `0111` | `and Rd, Rs` | `Rd ← Rd & Rs` | 0 | 0 | AND | 0 | 0 | 0 | 1 | 0 |
+| `1001` | `or Rd, Rs` | `Rd ← Rd \| Rs` | 0 | 0 | OR | 0 | 0 | 0 | 1 | 0 |
+| `1010` | `jump #imm` | `PC ← Imm` | x | x | x | 0 | 0 | x | 0 | 1 |
+| `1100` | `ld Rd, Rs, #off` | `Rd ← Mem[Rs + off]` | 1 | 1 | ADD | 0 | 1 | 1 | 1 | 0 |
+| `1101` | `st Rd, Rs, #off` | `Mem[Rs + off] ← Rd` | 1 | 1 | ADD | 1 | 0 | x | 0 | 0 |
 
 ---
 
@@ -119,7 +118,9 @@ flowchart LR
 ### 2. Hazard Detection Unit (ID 阶段 Load-Use 冒险检测)
 * **解决目标**: `ld` 指令的数据必须在 MEM 阶段才能产生，无法在下一周期直接前推至 EX 阶段。
 * **检测条件**:
-  $$\text{ID/EX.MemRead} == 1 \quad\land\quad (\text{ID/EX.Rd\_addr} == \text{IF/ID.Rd\_addr} \;\lor\; \text{ID/EX.Rd\_addr} == \text{IF/ID.Rs\_addr})$$
+  ```verilog
+  ID_EX_MemRead == 1 && (ID_EX_Rd_addr == IF_ID_Rd_addr || ID_EX_Rd_addr == IF_ID_Rs_addr)
+  ```
 * **动作**:
   1. 冻结 PC (`PC_Write = 0`)
   2. 冻结 IF/ID 寄存器 (`IF_ID_Write = 0`)
@@ -128,9 +129,9 @@ flowchart LR
 ### 3. Control Hazard (Jump 指令流水线冲刷)
 * **解决目标**: 跳转发生时，流水线已预取了后续错误指令。
 * **三步协同机制**:
-  1. **CU $\to$ HDU**: 译码出 `jump` 时拉高 `Jump` 信号。
-  2. **HDU $\to$ IF/ID**: 产生 `IF_ID_Flush` 冲刷信号。
-  3. **IF/ID 优先级重构**: $\text{Priority}: \text{Flush} > \text{Write}$。Flush 为 1 时无条件写零（替换为 NOP），彻底消除分支延迟槽污染。
+  1. **CU → HDU**: 译码出 `jump` 时拉高 `Jump` 信号。
+  2. **HDU → IF/ID**: 产生 `IF_ID_Flush` 冲刷信号。
+  3. **IF/ID 优先级重构**: `Priority: Flush > Write`。Flush 为 1 时无条件写零（替换为 NOP），彻底消除分支延迟槽污染。
 
 ---
 
@@ -146,16 +147,13 @@ flowchart LR
 
 | 测试用例 | 汇编测试指令序列 | 验证机制 | 仿真与 FPGA 硬件结果 |
 | :--- | :--- | :--- | :--- |
-| **Forwarding (RAW)** | `add R0, #3`<br/>`add R0, #4` | EX 阶段旁路前推（无停顿） | **$R0 = 7$**，ALU 直接获取最新计算值 |
-| **Load-Use Stall** | `st R0, R1, #0`<br/>`ld R2, R1, #0`<br/>`mov R3, #1`<br/>`add R2, R3` | HDU 注入 1-Cycle Bubble | **$R2$ 匹配预期内存读出值**，时序完美同步 |
-| **Jump Flush** | `mov R0, #5`<br/>`jmp 3`<br/>`mov R0, #99`<br/>`mov R1, #7` | IF/ID 寄存器硬件冲刷 (Flush) | **$R0 = 5, R1 = 7$**（`mov R0,#99` 被冲刷为 NOP，LED 实时同步显示一致） |
+| **Forwarding (RAW)** | `add R0, #3`<br/>`add R0, #4` | EX 阶段旁路前推（无停顿） | **R0 = 7**，ALU 直接获取最新计算值 |
+| **Load-Use Stall** | `st R0, R1, #0`<br/>`ld R2, R1, #0`<br/>`mov R3, #1`<br/>`add R2, R3` | HDU 注入 1-Cycle Bubble | **R2 匹配预期内存读出值**，时序完美同步 |
+| **Jump Flush** | `mov R0, #5`<br/>`jmp 3`<br/>`mov R0, #99`<br/>`mov R1, #7` | IF/ID 寄存器硬件冲刷 (Flush) | **R0 = 5, R1 = 7**（`mov R0,#99` 被冲刷为 NOP，LED 实时同步显示一致） |
 
 ### 3. Vivado 行为仿真波形
 
-<div align="center">
-  <img src="docs/waveform_simulation.png" alt="Simulation Waveform" width="95%"/>
-  <p><i>Figure 2: Cycle-accurate Pipeline Execution Waveform in Vivado</i></p>
-</div>
+![Simulation Waveform](./docs/waveform_simulation.png)
 
 ---
 

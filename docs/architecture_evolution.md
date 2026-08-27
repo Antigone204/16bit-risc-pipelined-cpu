@@ -19,7 +19,7 @@
 ```
 
 ### 1.1 五级流水线职责划分
-1. **IF (Instruction Fetch)**: 程序计数器（PC）输出地址至指令存储器读取 16 位机器码，专用加法器并行计算 $PC+1$。
+1. **IF (Instruction Fetch)**: 程序计数器（PC）输出地址至指令存储器读取 16 位机器码，专用加法器并行计算 `PC + 1`。
 2. **ID (Instruction Decode)**: 控制单元解码 4-bit Opcode；寄存器堆读取两路源操作数；立即数完成 16 位扩展；冒险检测单元（HDU）评估 Load-Use 与 Jump 状态。
 3. **EX (Execute)**: 前推单元（Forwarding Unit）仲裁操作数来源；两级 MUX 级联选通；ALU 执行算术/逻辑/有效地址计算。
 4. **MEM (Memory Access)**: 数据存储器根据 ALU 输出地址进行读写。
@@ -72,7 +72,9 @@ graph TD
 #### 2.2 检测与停顿逻辑 (1-Cycle Bubble Stall)
 * **部署位置**: ID 阶段。
 * **检测条件**:
-  $$\text{ID/EX.MemRead} == 1 \quad\land\quad (\text{ID/EX.Rd\_addr} == \text{IF/ID.Rd\_addr} \;\lor\; \text{ID/EX.Rd\_addr} == \text{IF/ID.Rs\_addr})$$
+  ```verilog
+  ID_EX.MemRead == 1 && (ID_EX.Rd_addr == IF_ID.Rd_addr || ID_EX.Rd_addr == IF_ID.Rs_addr)
+  ```
 * **执行动作 (插入气泡 Bubble)**:
   1. **冻结 PC**: `PC_Write = 0`，PC 保持当前值不变。
   2. **冻结 IF/ID**: `IF_ID_Write = 0`，保留当前正在译码的指令，下周期重新译码。
@@ -107,7 +109,7 @@ st R2, R0, #0    ; Mem[R0 + 0] <- R2
 ### Phase 4: Control Hazard —— Jump 指令与流水线 Flush
 
 #### 4.1 核心问题
-当 `jump #imm` 指令进入 ID 阶段并完成译码计算目标地址时，IF 阶段已经根据 $PC+1$ 预取了一条错误的顺序指令放入了 `IF/ID` 寄存器。
+当 `jump #imm` 指令进入 ID 阶段并完成译码计算目标地址时，IF 阶段已经根据 `PC + 1` 预取了一条错误的顺序指令放入了 `IF/ID` 寄存器。
 
 #### 4.2 三处关键改造
 1. **CU → HDU 联动**:
@@ -115,7 +117,7 @@ st R2, R0, #0    ; Mem[R0 + 0] <- R2
 2. **HDU → IF/ID 控制线**:
    HDU 产生 `IF_ID_Flush` 信号，与原有 `IF_ID_Write` 信号并列送入 `IF/ID` 寄存器。
 3. **IF/ID 寄存器优先级改造**:
-   $$\text{Priority}: \text{Flush} > \text{Write}$$
+   `Priority: Flush > Write`
    * 当 `Flush == 1` 时：无条件清零寄存器输出（写入 NOP），清空预取的无效指令。
    * 当 `Flush == 0` 且 `Write == 0` 时：保持原值（Stall）。
    * 其余情况：正常锁存下一指令。
@@ -144,6 +146,6 @@ PC 端则通过 `MUX_PC` 在 ID 阶段直接切换到跳转目标，被清除的
 
 | 测试类型 | 指令测试序列 | 目标验证机制 | 预期结果与硬件观测 |
 | :--- | :--- | :--- | :--- |
-| **Forwarding (RAW)** | `add R0,#3`<br/>`add R0,#4` | EX 阶段旁路前推（无停顿） | **$R0 = 7$**，ALU 直接获取 EX/MEM 最新计算值 |
-| **Load-Use Stall** | `st R0,R1,#0`<br/>`ld R2,R1,#0`<br/>`mov R3,#1`<br/>`add R2,R3` | HDU 注入 1-Cycle Bubble | **$R2$ 正确读出内存值**，流水线精准停顿 1 周期 |
-| **Jump Flush** | `mov R0,#5`<br/>`jmp 3`<br/>`mov R0,#99`<br/>`mov R1,#7` | IF/ID 寄存器硬件冲刷 (Flush) | **$R0 = 5, R1 = 7$**（`mov R0,#99` 被冲刷为 NOP，LED 实时显示一致） |
+| **Forwarding (RAW)** | `add R0,#3`<br/>`add R0,#4` | EX 阶段旁路前推（无停顿） | **R0 = 7**，ALU 直接获取 EX/MEM 最新计算值 |
+| **Load-Use Stall** | `st R0,R1,#0`<br/>`ld R2,R1,#0`<br/>`mov R3,#1`<br/>`add R2,R3` | HDU 注入 1-Cycle Bubble | **R2 正确读出内存值**，流水线精准停顿 1 周期 |
+| **Jump Flush** | `mov R0,#5`<br/>`jmp 3`<br/>`mov R0,#99`<br/>`mov R1,#7` | IF/ID 寄存器硬件冲刷 (Flush) | **R0 = 5, R1 = 7**（`mov R0,#99` 被冲刷为 NOP，LED 实时显示一致） |
