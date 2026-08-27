@@ -3,7 +3,7 @@
 // ============================================================================
 // Module: cpu_tb
 // Description: Testbench for 16-Bit RISC CPU verifying Hazard Handling & FPGA Ports
-// Reference: UESTC Digital Logic Design Report (Table 2 Test Cases)
+// Reference: Patterson & Hennessy (Computer Organization and Design RISC-V Edition)
 // ============================================================================
 module cpu_tb;
 
@@ -40,7 +40,7 @@ module cpu_tb;
         $dumpvars(0, cpu_tb);
 
         $display("==================================================================");
-        $display("   16-Bit RISC 5-Stage Pipelined CPU Simulation (UESTC 202602)   ");
+        $display("   16-Bit RISC 5-Stage Pipelined CPU Simulation                   ");
         $display("   Reference: Patterson & Hennessy (RISC-V Edition)               ");
         $display("==================================================================");
 

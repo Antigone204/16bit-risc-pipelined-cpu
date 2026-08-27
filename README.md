@@ -17,18 +17,6 @@
 
 ---
 
-## 📚 Academic Context & Reference
-
-* **Course**: *Digital Logical Design and Application* (UESTC - University of Electronic Science and Technology of China)
-* **Team (Team 202602)**:
-  * **徐瑞成 (Xu Ruicheng)**: Controller design, Hazard Detection Unit & Testbench architecture
-  * **李泊良 (Li Boliang)**: Datapath design, ALU & Register File implementation
-  * **刘颢诚 (Liu Haocheng)**: Pipeline register integration, FPGA synthesis & Board-level testing
-* **Core Reference**:
-  > **David A. Patterson and John L. Hennessy**, *Computer Organization and Design RISC-V Edition: The Hardware Software Interface*, The Morgan Kaufmann Series in Computer Architecture and Design.
-
----
-
 ## 📖 Project Highlights
 
 本项目实现了一个基于经典 **5 级流水线（IF-ID-EX-MEM-WB）** 的 **16-bit RISC 处理器**。体系结构设计紧密遵循 Patterson & Hennessy 经典流水线模型，完整历经了数据冒险前推（Forwarding）、Load-Use 气泡停顿（HDU Bubble Stall）、连续访存冲突权衡，以及控制冒险跳转冲刷（Jump Flush）的演进周期，并成功部署于 **EES-331 FPGA 开发板（Xilinx Zynq XC7Z020）**。
@@ -41,6 +29,8 @@
 * **物理 FPGA 板级验证与高可观测性**:
   * 运行于 **100 MHz** 系统时钟（引脚 `M19`），无 Setup/Hold 时序违例。
   * 专设板载 8 个 LED 实时映射寄存器状态（`led[7:4] = R0[3:0]`, `led[3:0] = R1[3:0]`），实现高度可观测的硬件级验证。
+* **理论依据与参考**:
+  > **David A. Patterson and John L. Hennessy**, *Computer Organization and Design RISC-V Edition: The Hardware Software Interface*, The Morgan Kaufmann Series in Computer Architecture and Design.
 
 ---
 

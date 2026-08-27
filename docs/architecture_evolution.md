@@ -2,11 +2,7 @@
 
 > **Academic Reference**:  
 > *Computer Organization and Design RISC-V Edition: The Hardware Software Interface*  
-> by **David A. Patterson** and **John L. Hennessy** (The Morgan Kaufmann Series in Computer Architecture and Design).  
->
-> **Project Context**:  
-> University of Electronic Science and Technology of China (UESTC)  
-> Course: *Digital Logical Design and Application* (Team 202602: 徐瑞成, 李泊良, 刘颢诚)
+> by **David A. Patterson** and **John L. Hennessy** (The Morgan Kaufmann Series in Computer Architecture and Design).
 
 ---
 
